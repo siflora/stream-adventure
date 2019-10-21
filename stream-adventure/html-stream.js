@@ -1,6 +1,10 @@
 const trumpet= require ('trumpet');
-const fs= require ('fs')
+const through = require('through2')
 var tr= trumpet();
-fs.createReadStream(process.argv[2]).pipe(tr);
-var stream=tr.select('.loud').createStream().toString().toUpperCase();
-console.log(stream)
+var loud=tr.select('.loud').createStream();
+loud.pipe(through(function (buf, _, next){
+  this.push(buf.toString().toUpperCase());
+  next()
+})).pipe(loud)
+process.stdin.pipe(tr).pipe(process.stdout)
+
